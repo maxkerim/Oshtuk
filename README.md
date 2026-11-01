@@ -1,29 +1,29 @@
 # Monitoring Script
 
-Мониторинг процесса `test` с логированием, проверкой HTTP и оповещениями в Telegram.
+Monitoring for the `test` process with logging, HTTP checks, and Telegram alerts.
 
-## Что проверяет скрипт
-- Проверяет состояние сервиса `test` через `systemctl is-active`.
-- Выполняет HTTPS-проверку по адресу `https://test.com/monitoring/test/api`.
-- Логирует события в `/var/log/monitoring.log`.
-- При падении процесса автоматически пытается выполнить `systemctl restart test`.
-- Отправляет сообщение в Telegram, если токен и chat ID настроены.
-- Возвращает корректные exit codes для автоматической обработки в cron, systemd или CI.
+## What the script checks
+- Verifies the `test` service state with `systemctl is-active`.
+- Performs an HTTPS check against `https://test.com/monitoring/test/api`.
+- Writes events to `/var/log/monitoring.log`.
+- Automatically attempts `systemctl restart test` if the process is down.
+- Sends a Telegram message if the bot token and chat ID are configured.
+- Returns proper exit codes for automation via cron, systemd, or CI.
 
 ## Exit codes
-- `0` — сервис активен и HTTP-ответ успешный.
-- `1` — сервис был неактивен и/или перезапуск завершился с ошибкой.
-- `2` — сервис активен, но HTTP-проверка не прошла.
-- `3` — Telegram-уведомление не отправилось.
+- `0` — the service is active and the HTTP check succeeded.
+- `1` — the service was inactive and/or the restart failed.
+- `2` — the service is active, but the HTTP check failed.
+- `3` — the Telegram notification failed to send.
 
 ## Telegram alerting
-Для включения Telegram-оповещений задайте переменные перед запуском службы:
+To enable Telegram notifications, set the variables before starting the service:
 
 ```bash
 sudo systemctl edit monitor-test.service
 ```
 
-И добавьте секцию:
+Then add:
 
 ```ini
 [Service]
@@ -32,25 +32,25 @@ Environment=TELEGRAM_BOT_TOKEN=123456:ABCDEF
 Environment=TELEGRAM_CHAT_ID=123456789
 ```
 
-После этого перезагрузите сервисы:
+After that, reload the service configuration:
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart monitor-test.service
 ```
 
-Если переменные не заданы, Telegram-уведомления просто отключаются, а основной мониторинг продолжает работать.
+If these variables are not set, Telegram alerts are simply skipped and the monitoring continues to work normally.
 
-## Установка
+## Installation
 
-1. Скопируйте скрипт в системную директорию:
+1. Copy the script to a system directory:
 
 ```bash
 sudo cp monitor-test.sh /usr/local/bin/monitor_test.sh
 sudo chmod +x /usr/local/bin/monitor_test.sh
 ```
 
-2. Подключите systemd-unit:
+2. Enable the systemd units:
 
 ```bash
 sudo cp monitor-test.service /etc/systemd/system/
@@ -59,16 +59,16 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now monitor-test.timer
 ```
 
-3. Проверьте состояние таймера:
+3. Check the timer status:
 
 ```bash
 sudo systemctl status monitor-test.timer
 sudo journalctl -u monitor-test.service -f
 ```
 
-## Пример логов
+## Example logs
 
-Пример содержимого `/var/log/monitoring.log`:
+Example contents of `/var/log/monitoring.log`:
 
 ```text
 2026-11-01 10:00:00 - test is running and HTTP check passed (HTTP 200)
@@ -77,9 +77,9 @@ sudo journalctl -u monitor-test.service -f
 2026-11-01 10:02:01 - test restarted successfully
 ```
 
-## Удаление systemd service
+## Removing the systemd service
 
-Чтобы полностью удалить мониторинг:
+To fully remove the monitoring setup:
 
 ```bash
 sudo systemctl disable --now monitor-test.timer
@@ -91,6 +91,6 @@ sudo systemctl reset-failed
 sudo rm -f /var/log/monitoring.log
 ```
 
-## Скриншот результата работы
+## Screenshot of the result
 
-![Результат работы мониторинга](monitor-result.png)
+![Monitoring result](monitor-result.png)
