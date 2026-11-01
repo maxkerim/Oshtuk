@@ -4,6 +4,9 @@ After=network.target
 
 [Service]
 Type=oneshot
+Environment=MONITOR_URL=https://test.com/monitoring/test/api
+Environment=TELEGRAM_BOT_TOKEN=YOUR_BOT_TOKEN_HERE
+Environment=TELEGRAM_CHAT_ID=YOUR_CHAT_ID_HERE
 ExecStart=/usr/local/bin/monitor_test.sh
 
 [Install]
